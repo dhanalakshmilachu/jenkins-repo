@@ -7,13 +7,21 @@ pipeline {
 
     stages {
 
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Terraform Init') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    sh 'terraform init'
+                    bat '''
+                        terraform init
+                    '''
                 }
             }
         }
@@ -24,7 +32,9 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    sh 'terraform plan'
+                    bat '''
+                        terraform plan
+                    '''
                 }
             }
         }
@@ -35,14 +45,18 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    sh 'terraform apply -auto-approve'
+                    bat '''
+                        terraform apply -auto-approve
+                    '''
                 }
             }
         }
 
         stage('Show Output') {
             steps {
-                sh 'terraform output'
+                bat '''
+                    terraform output
+                '''
             }
         }
     }
