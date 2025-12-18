@@ -12,7 +12,7 @@ resource "aws_security_group" "jenkins_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # SSH open to all IPs
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -20,7 +20,7 @@ resource "aws_security_group" "jenkins_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # HTTP open to all IPs
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -31,23 +31,23 @@ resource "aws_security_group" "jenkins_sg" {
   }
 }
 
-# EC2 Instance using existing key and external user_data script
+# EC2 Instance using existing key and separate user_data script
 resource "aws_instance" "jenkins_ec2" {
-  ami             = "ami-0fa91bc90632c73c9"
-  instance_type   = "t3.micro"
-  key_name        = "new-key"                # Your existing key
-  security_groups = [aws_security_group.jenkins_sg.name]
-
-  # Reference external userdata.sh file
-  user_data = file("${path.module}/userdata.sh")
+  ami                         = "ami-0fa91bc90632c73c9"
+  instance_type               = "t3.micro"
+  key_name                    = "new-key"
+  security_groups             = [aws_security_group.jenkins_sg.name]
+  associate_public_ip_address = true   # <-- ensures the instance gets a public IP
+  user_data                   = file("${path.module}/userdata.sh")
 
   tags = {
     Name = "Jenkins-Terraform-EC2"
   }
 }
 
-# Output the public IP of the instance
+# Output the public IP
 output "ec2_public_ip" {
   value = aws_instance.jenkins_ec2.public_ip
 }
+
 
