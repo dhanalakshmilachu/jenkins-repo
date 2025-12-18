@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = "eu-north-1"
+        TF = "C:\\Program Files\\terraform\\terraform.exe"
     }
 
     stages {
@@ -19,9 +20,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat '''
-                        terraform init
-                    '''
+                    bat '"%TF%" init'
                 }
             }
         }
@@ -32,9 +31,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat '''
-                        terraform plan
-                    '''
+                    bat '"%TF%" plan'
                 }
             }
         }
@@ -45,20 +42,17 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat '''
-                        terraform apply -auto-approve
-                    '''
+                    bat '"%TF%" apply -auto-approve'
                 }
             }
         }
 
         stage('Show Output') {
             steps {
-                bat '''
-                    terraform output
-                '''
+                bat '"%TF%" output'
             }
         }
     }
 }
+
 
