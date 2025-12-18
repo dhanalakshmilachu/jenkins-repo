@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_instance" "jenkins_ec2" {
   ami           = "ami-0fa91bc90632c73c9"   # Ubuntu AMI (Stockholm)
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   key_name      = "new-key"                  # existing keypair name
 
   user_data = file("${path.module}/userdata.sh")
