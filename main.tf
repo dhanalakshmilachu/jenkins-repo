@@ -31,19 +31,22 @@ resource "aws_security_group" "jenkins_sg" {
   }
 }
 
-# EC2 Instance using existing key
+# EC2 Instance using existing key and external user_data script
 resource "aws_instance" "jenkins_ec2" {
-  ami             = "ami-0fa91bc90632c73c9"  # Your specified AMI
-  instance_type   = "t3.micro"               # Your specified instance type
+  ami             = "ami-0fa91bc90632c73c9"
+  instance_type   = "t3.micro"
   key_name        = "new-key"                # Your existing key
   security_groups = [aws_security_group.jenkins_sg.name]
+
+  # Reference external userdata.sh file
+  user_data = file("${path.module}/userdata.sh")
 
   tags = {
     Name = "Jenkins-Terraform-EC2"
   }
 }
 
-# Output the public IP
+# Output the public IP of the instance
 output "ec2_public_ip" {
   value = aws_instance.jenkins_ec2.public_ip
 }
