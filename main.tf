@@ -12,7 +12,7 @@ resource "aws_security_group" "jenkins_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # SSH open to all IPs (less secure)
+    cidr_blocks = ["0.0.0.0/0"]  # SSH open to all IPs
   }
 
   ingress {
@@ -31,17 +31,11 @@ resource "aws_security_group" "jenkins_sg" {
   }
 }
 
-# Key pair (assumes you already created one in AWS)
-resource "aws_key_pair" "jenkins_key" {
-  key_name   = "new-key"                     # Replace with your key name
-  public_key = file("~/.ssh/new-key.pub")    # Replace with your public key path
-}
-
-# EC2 Instance
+# EC2 Instance using existing key
 resource "aws_instance" "jenkins_ec2" {
-  ami             = "ami-0fa91bc90632c73c9"  # Ubuntu 22.04 LTS in eu-north-1
-  instance_type   = "t3.micro"
-  key_name        = aws_key_pair.jenkins_key.key_name
+  ami             = "ami-0fa91bc90632c73c9"  # Your specified AMI
+  instance_type   = "t3.micro"               # Your specified instance type
+  key_name        = "new-key"                # Your existing key
   security_groups = [aws_security_group.jenkins_sg.name]
 
   tags = {
@@ -53,5 +47,4 @@ resource "aws_instance" "jenkins_ec2" {
 output "ec2_public_ip" {
   value = aws_instance.jenkins_ec2.public_ip
 }
-
 
